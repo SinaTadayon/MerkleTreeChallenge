@@ -17,17 +17,6 @@ export class InclusionProof {
   }
 }
 
-export class InclusionProof2 {
-  public position: Position;
-  public nodeHash: string;
-
-  constructor(position: Position, hash: string) {
-    this.position = position;
-    this.nodeHash = hash;
-  }
-}
-
-
 export class MerkleTree {
   private _root: MerkleNode;
 
@@ -47,6 +36,12 @@ export class MerkleTree {
 
   private buildTree(leaves: Array<MerkleNode>) {
     this._leaves.push(...leaves);
+
+    if (leaves.length === 1) {
+      this._root = leaves[0];
+      return;
+    }
+
     let nodes = leaves;
     while (nodes.length > 1) {
       nodes = this.buildMerkleTree(nodes);
@@ -124,7 +119,7 @@ export class MerkleTree {
         parent.left === child ? Position.RIGHT : Position.LEFT;
       hashProof.push(<InclusionProof>{
         position: positionNode,
-        nodeHash: nextChild?.hash,
+        nodeHash: nextChild ? nextChild.hash : 0x00,
       });
       // @ts-ignore
       this.doGetInclusionProof(hashProof, parent.parent, child.parent);
@@ -145,7 +140,9 @@ export class MerkleTree {
       computeHash =
         proof.position === Position.LEFT
           ? keccak256(Buffer.concat([proof.nodeHash, computeHash]))
-          : keccak256(Buffer.concat([computeHash, proof.nodeHash]));
+          : proof.nodeHash
+          ? keccak256(Buffer.concat([computeHash, proof.nodeHash]))
+          : computeHash;
     });
 
     return rootHash.equals(computeHash);

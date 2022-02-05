@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
 interface IMessageBoard {
@@ -8,7 +8,7 @@ interface IMessageBoard {
         RIGHT
     }
 
-    struct IncProof {
+    struct InclusionProof {
         Position position;
         bytes32 nodeHash;
     }
@@ -20,7 +20,7 @@ interface IMessageBoard {
     function addUser(address newUser) external; 
 
     function twitMessage(
-        IncProof[] calldata iproof,
+        InclusionProof[] calldata proof,
         string calldata message
     ) external;
 }
